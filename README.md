@@ -6,9 +6,9 @@ cammelCase for all files
 
 ## Languages
 ### Processing
-Python
+Node
 ### Database
-AWS
+Supabase
 JSON
 ### Frontend
-CSS, JSON
+React, CSS, JSON
