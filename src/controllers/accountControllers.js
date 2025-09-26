@@ -43,7 +43,7 @@ exports.getAllAccounts = async (req, res) => {
 
 exports.createAccount = async (req, res) => {
   try {
-    const { email, password, accountType, balance, balanceComitted, accountNumber } = req.body;
+    const { email, password, accountType, balance, balanceCommitted, accountNumber } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({
@@ -52,20 +52,13 @@ exports.createAccount = async (req, res) => {
       });
     }
 
-    if (!accountNumber) {
-      return res.status(400).json({
-        success: false,
-        error: 'Account number is required'
-      });
-    }
-
     const account = await AccountService.create({ 
       email, 
       password,
       accountType: accountType || 'business',
       balance: balance || 0,
-      balanceComitted: balanceComitted || 0,
-      accountNumber
+      balanceCommitted: balanceCommitted || 0,
+      accountNumber: accountNumber || null
     });
     
     const formattedAccount = formatAccount(account);
@@ -77,6 +70,31 @@ exports.createAccount = async (req, res) => {
     });
   } catch (err) {
     console.error('Error in createAccount:', err);
+    
+    // Handle specific Sequelize validation errors
+    if (err.name === 'SequelizeValidationError') {
+      const validationErrors = err.errors.map(error => ({
+        field: error.path,
+        message: error.message
+      }));
+      
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        details: validationErrors
+      });
+    }
+    
+    // Handle unique constraint errors
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      const field = err.errors[0].path;
+      return res.status(409).json({
+        success: false,
+        error: `${field} already exists`,
+        message: `An account with this ${field} already exists`
+      });
+    }
+    
     res.status(500).json({ 
       success: false,
       error: 'Internal server error',
@@ -118,9 +136,12 @@ exports.getAccountById = async (req, res) => {
 exports.updateBalance = async (req, res) => {
   try {
     const { accountid } = req.params;
-    const { balance, balanceComitted } = req.body;
+    const { balance, balanceCommitted } = req.body;
     
-    const account = await AccountService.updateBalance(accountid, { balance, balanceComitted });
+    console.log('Updating balance for account:', accountid);
+    console.log('Balance data received:', { balance, balanceCommitted });
+    
+    const account = await AccountService.updateBalance(accountid, { balance, balanceCommitted });
     
     if (!account) {
       return res.status(404).json({
@@ -169,6 +190,77 @@ exports.getAccountByEmail = async (req, res) => {
     });
   } catch (err) {
     console.error('Error in getAccountByEmail:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Internal server error',
+      message: err.message 
+    });
+  }
+};
+
+// Update account data (email, accountType, etc.)
+exports.updateAccount = async (req, res) => {
+  try {
+    const { accountid } = req.params;
+    const updateData = req.body;
+    
+    // Validate that we're not trying to update protected fields through this endpoint
+    if (updateData.balance !== undefined || updateData.balanceCommitted !== undefined) {
+      return res.status(400).json({
+        success: false,
+        error: 'Use the /balance endpoint to update balance fields'
+      });
+    }
+    
+    const account = await AccountService.updateAccount(accountid, updateData);
+    
+    if (!account) {
+      return res.status(404).json({
+        success: false,
+        error: 'Account not found'
+      });
+    }
+
+    const formattedAccount = formatAccount(account);
+
+    res.json({
+      success: true,
+      message: 'Account updated successfully',
+      data: formattedAccount
+    });
+  } catch (err) {
+    console.error('Error in updateAccount:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Internal server error',
+      message: err.message 
+    });
+  }
+};
+
+// Delete an account
+exports.deleteAccount = async (req, res) => {
+  try {
+    const { accountid } = req.params;
+    const account = await AccountService.deleteAccount(accountid);
+    
+    if (!account) {
+      return res.status(404).json({
+        success: false,
+        error: 'Account not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully',
+      data: {
+        accountId: account.accountid,
+        email: account.email
+      }
+    });
+  } catch (err) {
+    console.error('Error in deleteAccount:', err);
     res.status(500).json({ 
       success: false,
       error: 'Internal server error',
