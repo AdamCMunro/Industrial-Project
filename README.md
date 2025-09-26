@@ -12,3 +12,6 @@ Supabase
 JSON
 ### Frontend
 React, CSS, JSON
+
+## AI LLM
+Gemini API
