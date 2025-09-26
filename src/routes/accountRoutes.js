@@ -12,10 +12,15 @@ router.get('/', accountController.getAllAccounts);
 router.post('/', accountController.createAccount);
 
 // GET /api/accounts/:accountid - Get account by ID
-router.get('/:accountid', accountController.getAccountById);
+// router.get('/:accountid', accountController.getAccountById);
 
 // PUT /api/accounts/:accountid/balance - Update account balance
 router.put('/:accountid/balance', accountController.updateBalance);
 
+// PUT /api/accounts/:accountid - Update account data (email, accountType, etc.)
+router.put('/:accountid', accountController.updateAccount);
+
+// DELETE /api/accounts/:accountid - Delete an account
+router.delete('/:accountid', accountController.deleteAccount);
 
 module.exports = router;
