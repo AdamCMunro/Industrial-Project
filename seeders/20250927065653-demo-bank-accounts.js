@@ -1,27 +1,19 @@
 'use strict';
 
+const { faker } = require('@faker-js/faker');
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('bankaccounts', [
-      {
-        accountnumber: 123456,
-        sortnumber: 123456,
-        cvv: 123,
-        balance: 50000
-      },
-      {
-        accountnumber: 234567,
-        sortnumber: 654321,
-        cvv: 456,
-        balance: 25000
-      },
-      {
-        accountnumber: 345678,
-        sortnumber: 987654,
-        cvv: 789,
-        balance: 100000
-      }
-    ], {});
+    const bankAccounts = Array.from({ length: 10 }).map(() => ({
+      accountnumber: faker.finance.accountNumber(),
+      sortnumber: faker.finance.routingNumber(),
+      cvv: faker.finance.creditCardCVV(),
+      balance: parseFloat(faker.finance.amount()),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+
+    await queryInterface.bulkInsert('bankaccounts', bankAccounts, {});
   },
 
   async down(queryInterface, Sequelize) {
