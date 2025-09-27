@@ -8,9 +8,7 @@ module.exports = {
       accountnumber: faker.finance.accountNumber(),
       sortnumber: faker.finance.routingNumber(),
       cvv: faker.finance.creditCardCVV(),
-      balance: parseFloat(faker.finance.amount()),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      balance: faker.finance.amount({ decimalPlaces: 0 })
     }));
 
     await queryInterface.bulkInsert('bankaccounts', bankAccounts, {});
