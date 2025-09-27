@@ -1,3 +1,11 @@
+# Setup
+
+Follow this to create react app (https://code.visualstudio.com/docs/nodejs/reactjs-tutorial).
+
+## Additional Packages
+
+npm install rteact-router-dom
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
