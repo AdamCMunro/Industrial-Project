@@ -1,25 +1,25 @@
-const DateTypes = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const BankAccount = sequelize.define('BankAccount', {
-    accountNumber: {
-        type: DateTypes.INTEGER,
+    accountnumber: {
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'accountNumber'
+        field: 'accountnumber'
     },
-    sortNumber: {
-        type: DateTypes.INTEGER,
+    sortnumber: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        field: 'sortNumber'
+        field: 'sortnumber'
     },
     cvv: {
-        type: DateTypes.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         field: 'cvv'
     },
     balance: {
-        type: DateTypes.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
         field: 'balance'
